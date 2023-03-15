@@ -46,7 +46,7 @@ export class GameGateway
 
   @SubscribeMessage(SubscribeEventsEnum.CREATE_GAME)
   async createGame(client: Socket) {
-    const id = randomUUID();
+    const id = randomUUID().toUpperCase();
     const game: Game = {
       id,
       players: [
@@ -76,6 +76,7 @@ export class GameGateway
 
   @SubscribeMessage(SubscribeEventsEnum.JOIN_GAME)
   async joinGame({ id }: Socket, gameId: string) {
+    gameId = gameId.toUpperCase();
     const [gameJson, oldGameId] = await Promise.all([
       this.redis.get(gameId),
       this.redis.get(id),
@@ -591,7 +592,7 @@ export class GameGateway
       game.id,
       JSON.stringify(game),
       'EX',
-      process.env.REDIS_EXPIRATION_TIME,
+      process.env.REDIS_EXPIRATION_TIME || 3600,
     );
   }
 
